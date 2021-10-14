@@ -1,14 +1,17 @@
 export const popAndToast = {
   options: {
-    // defaults
-    target: 'body', // where to insert
-    popupEl: null, // popup element, must init to build
-    toastEl: null,
-    content: '', // modal content
-    timeout: 5000, // 5 seconds
-    refresh: 2592000000, //30 days by default
-    copy: '', // copy for clipboard on click
-    defaultStyle: true, // set to false to implement custom style
+    popup: {
+      // defaults
+      target: 'body', // where to insert
+      popupEl: null, // popup element, must init to build
+      toastEl: null,
+      content: '', // modal content
+      timeout: 5000, // 5 seconds
+      refresh: 2592000000, //30 days by default
+      copy: '', // copy for clipboard on click
+      defaultStyle: true, // set to false to implement custom style
+    },
+    toast: {},
   },
   init: function (opts) {
     let _this = this; // for event listeners
@@ -22,7 +25,7 @@ export const popAndToast = {
       last = new Date(JSON.parse(last).date).valueOf();
 
       // check refresh period for last shown date
-      if (Date.now() - last >= this.options.refresh) {
+      if (Date.now() - last >= this.options.popup.refresh) {
         console.info('PopAndToastInfo: too soon to show popup again.');
         _showModal = false;
       }
@@ -36,7 +39,7 @@ export const popAndToast = {
       if (!_ready) {
         // mixin/override options
         for (const [key, value] of Object.entries(opts)) {
-          this.options[key] = value;
+          this.options.popup[key] = value;
         }
         // build required properties
         this.popupEl = document.createElement('div');
@@ -48,7 +51,7 @@ export const popAndToast = {
               <a href="#" aria-label="Close Modal Popup">&times;</a>
           </div>
           <div class="pop__content">
-              ${this.options.content}
+              ${this.options.popup.content}
           </div>
           </div>`;
 
@@ -57,7 +60,7 @@ export const popAndToast = {
           .querySelector('.pop__close')
           .addEventListener('click', (evt) => {
             document
-              .querySelector(_this.options.target)
+              .querySelector(_this.options.popup.target)
               .removeChild(_this.popupEl);
           });
 
@@ -65,13 +68,13 @@ export const popAndToast = {
           .querySelector('.pop__content')
           .addEventListener('click', async (evt) => {
             document
-              .querySelector(_this.options.target)
+              .querySelector(_this.options.popup.target)
               .removeChild(_this.popupEl);
 
             // copy the code to the clipboard
-            if (this.options.copy && navigator.clipboard) {
+            if (this.options.popup.copy && navigator.clipboard) {
               try {
-                await navigator.clipboard.writeText(this.options.copy);
+                await navigator.clipboard.writeText(this.options.popup.copy);
                 console.log('Successfully copied to clipboard');
               } catch (err) {
                 console.error('Error copying to clipboard');
@@ -80,7 +83,7 @@ export const popAndToast = {
           });
 
         // check for and inject default style
-        if (this.options.defaultStyle) {
+        if (this.options.popup.defaultStyle) {
           const style = document.createElement('style');
           style.innerHTML = popupStyle;
           document.head.appendChild(style);
@@ -89,7 +92,7 @@ export const popAndToast = {
     }
 
     // toast init
-    if (this.options.toast) {
+    if (this.options.popup.toast) {
       this.toastEl = document.createElement('div');
 
       this.toastEl.innerHTML = `
@@ -107,19 +110,19 @@ export const popAndToast = {
       setTimeout(
         () =>
           requestAnimationFrame(() =>
-            document.querySelector(_this.options.target).firstElementChild
+            document.querySelector(_this.options.popup.target).firstElementChild
               ? document
-                  .querySelector(_this.options.target)
+                  .querySelector(_this.options.popup.target)
                   .insertBefore(
                     _this.popupEl,
-                    document.querySelector(_this.options.target)
+                    document.querySelector(_this.options.popup.target)
                       .firstElementChild
                   )
               : document
-                  .querySelector(_this.options.target)
+                  .querySelector(_this.options.popup.target)
                   .append(_this.popupEl)
           ),
-        this.options.timeout
+        this.options.popup.timeout
       );
     } else if (!_ready) {
       throw Error('PopAndToastError: must init before use.');
