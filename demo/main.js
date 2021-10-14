@@ -4,7 +4,6 @@ popAndToast
   .init({
     popup: {
       refresh: 10000, // 10 seconds for a refresh
-      timeout: 2000, // 2 seconds to show
       content: `
       <h2>Some Heading</h2>
       <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
@@ -34,3 +33,5 @@ popAndToast
     },
   })
   .showPopup();
+// will be called too soon, look for message in console
+setTimeout(() => popAndToast.showPopup('Some updated text'), 5000);

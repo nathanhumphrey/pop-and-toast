@@ -4,7 +4,6 @@ export const popAndToast = {
     target: 'body', // where to insert
     el: null, // popup element, must init to build
     content: '', // modal content
-    timeout: 0, // immediately
     refresh: 0, // always
     defaultStyle: true, // set to false to implement custom style
     onClick: null, // content click callback
@@ -16,7 +15,6 @@ export const popAndToast = {
     // only init once
     if (!_ready) {
       let _this = this; // for event listeners
-      let last;
 
       // prep popup and toast options
       if (opts) {
@@ -34,85 +32,77 @@ export const popAndToast = {
       }
 
       // popup init
-      _showModal = true;
+      this.popup.el = createPopupEl(this.popup.content);
 
-      // check for previous popup showing
-      if ((last = localStorage.getItem('popAndToast'))) {
-        last = +JSON.parse(last).date;
+      // add close and copy listeners
+      this.popup.el
+        .querySelector('.pop__close')
+        .addEventListener('click', (evt) => {
+          document
+            .querySelector(_this.popup.target)
+            .removeChild(_this.popup.el);
+        });
 
-        // check refresh period for last shown date
-        if (Date.now() - last <= this.popup.refresh) {
-          console.info('PopAndToastInfo: too soon to show popup again.');
-          _showModal = false;
-        }
+      // check for content click callback
+      if (this.popup.onClick) {
+        this.popup.el
+          .querySelector('.pop__content')
+          .addEventListener('click', this.popup.onClick);
       }
 
-      if (_showModal) {
-        // set/update the last shown date
-        localStorage.setItem(
-          'popAndToast',
-          JSON.stringify({ date: Date.now() })
-        );
-
-        // build required properties
-        this.popup.el = createPopupEl(this.popup.content);
-
-        // add close and copy listeners
-        this.popup.el
-          .querySelector('.pop__close')
-          .addEventListener('click', (evt) => {
-            document
-              .querySelector(_this.popup.target)
-              .removeChild(_this.popup.el);
-          });
-
-        // check for content click callback
-        if (this.popup.onClick) {
-          this.popup.el
-            .querySelector('.pop__content')
-            .addEventListener('click', this.popup.onClick);
-        }
-
-        // check for and inject default style
-        if (this.popup.defaultStyle) {
-          const style = document.createElement('style');
-          style.innerHTML = popupStyle;
-          document.head.appendChild(style);
-        }
+      // check for and inject default style
+      if (this.popup.defaultStyle) {
+        const style = document.createElement('style');
+        style.innerHTML = popupStyle;
+        document.head.appendChild(style);
       }
 
       // toast init
-      if (this.popup.toast) {
-        this.toastEl = document.createElement('div');
+      this.toastEl = document.createElement('div');
 
-        this.toastEl.innerHTML = `
+      this.toastEl.innerHTML = `
         <div class="toast-wrapper">Some text some message..</div>
       `;
-      }
+
       _ready = true; // only init once
     }
 
     // return obj for chaining
     return this;
   },
-  showPopup: function () {
+  showPopup: function (content) {
+    let last;
+    _showModal = true;
+
+    // check for previous popup showing
+    if ((last = localStorage.getItem('popAndToast'))) {
+      last = +JSON.parse(last).date;
+
+      // check refresh period for last shown date
+      if (Date.now() - last <= this.popup.refresh) {
+        console.info('PopAndToastInfo: too soon to show popup again.');
+        _showModal = false;
+      }
+    }
+
+    // set/update the last shown date
+    localStorage.setItem('popAndToast', JSON.stringify({ date: Date.now() }));
     if (_showModal) {
       const _this = this;
-      setTimeout(
-        () =>
-          requestAnimationFrame(() =>
-            document.querySelector(_this.popup.target).firstElementChild
-              ? document
-                  .querySelector(_this.popup.target)
-                  .insertBefore(
-                    _this.popup.el,
-                    document.querySelector(_this.popup.target).firstElementChild
-                  )
-              : document
-                  .querySelector(_this.popup.target)
-                  .append(_this.popup.el)
-          ),
-        this.popup.timeout
+
+      if (content) {
+        this.popup.el.querySelector('.pop__content').innerHTML = content;
+      }
+
+      requestAnimationFrame(() =>
+        document.querySelector(_this.popup.target).firstElementChild
+          ? document
+              .querySelector(_this.popup.target)
+              .insertBefore(
+                _this.popup.el,
+                document.querySelector(_this.popup.target).firstElementChild
+              )
+          : document.querySelector(_this.popup.target).append(_this.popup.el)
       );
     } else if (!_ready) {
       throw Error('PopAndToastError: must init before use.');
@@ -124,6 +114,22 @@ export const popAndToast = {
 // encapsulated state vars
 let _ready = false;
 let _showModal = false;
+
+// helper functions
+const createPopupEl = (content) => {
+  const el = document.createElement('div');
+  el.classList.add('pop');
+  el.innerHTML = `
+    <div class="pop__wrapper">
+    <div class="pop__close">
+        <a href="#" aria-label="Close Modal Popup">&times;</a>
+    </div>
+    <div class="pop__content">
+        ${content}
+    </div>
+    </div>`;
+  return el;
+};
 
 // default CSS styling for popup and toast
 const popupStyle = `
@@ -222,18 +228,3 @@ const toastStyle = `
     to {bottom: 0; opacity: 0;}
   }
 `;
-
-const createPopupEl = (content) => {
-  const el = document.createElement('div');
-  el.classList.add('pop');
-  el.innerHTML = `
-    <div class="pop__wrapper">
-    <div class="pop__close">
-        <a href="#" aria-label="Close Modal Popup">&times;</a>
-    </div>
-    <div class="pop__content">
-        ${content}
-    </div>
-    </div>`;
-  return el;
-};
