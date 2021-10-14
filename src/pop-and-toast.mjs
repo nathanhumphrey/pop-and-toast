@@ -20,16 +20,22 @@ export const popAndToast = {
       let last;
 
       // prep popup and toast options
-      opts.popup = opts.popup || {};
-      opts.toast = opts.toast || {};
+      if (opts) {
+        opts.popup = opts.popup || {};
+        opts.toast = opts.toast || {};
+
+        // mixin/override options
+        for (const [key, value] of Object.entries(opts.popup)) {
+          this.popup[key] = value;
+        }
+
+        for (const [key, value] of Object.entries(opts.toast)) {
+          this.toast[key] = value;
+        }
+      }
 
       // popup init
       _showModal = true;
-
-      // mixin/override options
-      for (const [key, value] of Object.entries(opts.popup)) {
-        this.popup[key] = value;
-      }
 
       // check for previous popup showing
       if ((last = localStorage.getItem('popAndToast'))) {
@@ -232,8 +238,3 @@ const createPopupEl = (content) => {
     </div>`;
   return el;
 };
-// function myFunction() {
-//   var x = document.getElementById("snackbar");
-//   x.className = "show";
-//   setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-// }
