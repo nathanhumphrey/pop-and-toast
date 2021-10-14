@@ -16,9 +16,6 @@ export const popAndToast = {
     defaultStyle: true, // set to false to implement custom style
     onClick: null, // content click callback
   },
-  toast: {
-    el: null, // toast element, must init to build
-  },
   init: function (opts) {
     // only init once
     if (!_ready) {

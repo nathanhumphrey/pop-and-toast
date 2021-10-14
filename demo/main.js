@@ -3,7 +3,7 @@ import { popAndToast } from '../src/pop-and-toast.mjs';
 popAndToast
   .init({
     popup: {
-      refresh: 6000, // 10 seconds for a refresh
+      refresh: 6000, // 6 seconds for a refresh
       content: `
       <h2>Some Heading</h2>
       <p>
