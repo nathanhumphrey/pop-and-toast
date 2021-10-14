@@ -5,8 +5,8 @@ export const popAndToast = {
       target: 'body', // where to insert
       el: null, // popup element, must init to build
       content: '', // modal content
-      timeout: 5000, // 5 seconds
-      refresh: 2592000000, //30 days by default
+      timeout: 0, // immediately
+      refresh: 0, // always
       copy: '', // copy for clipboard on click
       defaultStyle: true, // set to false to implement custom style
       onClick: null, // content click callback

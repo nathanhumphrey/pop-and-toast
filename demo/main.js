@@ -3,8 +3,8 @@ import { popAndToast } from '../src/pop-and-toast.mjs';
 popAndToast
   .init({
     popup: {
-      refresh: 0,
-      timeout: 0,
+      refresh: 10000, // 10 seconds for a refresh
+      timeout: 2000, // 2 seconds to show
       content: `
       <h2>Some Heading</h2>
       <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
