@@ -60,7 +60,7 @@ export const popAndToast = {
       this.toastEl = document.createElement('div');
 
       this.toastEl.innerHTML = `
-        <div class="toast-wrapper">Some text some message..</div>
+        <div class="toast__wrapper">Some toast message ...</div>
       `;
 
       _ready = true; // only init once
@@ -104,18 +104,23 @@ export const popAndToast = {
               )
           : document.querySelector(_this.popup.target).append(_this.popup.el)
       );
+
       this.popup.closed = false;
     } else if (!_ready) {
       throw Error('PopAndToastError: must init before use.');
     }
+    return this;
   },
   closePopup: function () {
     if (!this.popup.closed) {
       document.querySelector(this.popup.target).removeChild(this.popup.el);
       this.popup.closed == true;
     }
+    return this;
   },
-  showToast: function () {},
+  showToast: function () {
+    return this;
+  },
 };
 
 // encapsulated state vars
@@ -193,7 +198,7 @@ const popupStyle = `
 `;
 
 const toastStyle = `
-  #snackbar {
+  .toast__wrapper {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
@@ -209,7 +214,7 @@ const toastStyle = `
     font-size: 17px;
   }
 
-  #snackbar.show {
+  .toast__wrapper-show {
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
