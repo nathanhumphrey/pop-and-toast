@@ -26,40 +26,32 @@ export const popAndToast = {
     // popup init
     _showModal = true;
 
+    // mixin/override options
+    for (const [key, value] of Object.entries(opts.popup)) {
+      this.options.popup[key] = value;
+    }
+
     // check for previous popup showing
     if ((last = localStorage.getItem('popAndToast'))) {
-      last = new Date(JSON.parse(last).date).valueOf();
+      last = +JSON.parse(last).date;
 
       // check refresh period for last shown date
-      if (Date.now() - last >= this.options.popup.refresh) {
+      if (Date.now() - last <= this.options.popup.refresh) {
         console.info('PopAndToastInfo: too soon to show popup again.');
         _showModal = false;
       }
-    } else {
-      // set the last shown date
+    }
+
+    if (_showModal) {
+      // set/update the last shown date
       localStorage.setItem('popAndToast', JSON.stringify({ date: Date.now() }));
     }
 
     if (_showModal) {
       // only if we're going to show the modal
       if (!_ready) {
-        // mixin/override options
-        for (const [key, value] of Object.entries(opts.popup)) {
-          this.options.popup[key] = value;
-        }
         // build required properties
-        this.options.popup.el = document.createElement('div');
-        this.options.popup.el.classList.add('pop');
-
-        this.options.popup.el.innerHTML = `
-          <div class="pop__wrapper">
-          <div class="pop__close">
-              <a href="#" aria-label="Close Modal Popup">&times;</a>
-          </div>
-          <div class="pop__content">
-              ${this.options.popup.content}
-          </div>
-          </div>`;
+        this.options.popup.el = createPopupEl(this.options.popup.content);
 
         // add close and copy listeners
         this.options.popup.el
@@ -228,6 +220,20 @@ const toastStyle = `
   }
 `;
 
+const createPopupEl = (content) => {
+  const el = document.createElement('div');
+  el.classList.add('pop');
+  el.innerHTML = `
+    <div class="pop__wrapper">
+    <div class="pop__close">
+        <a href="#" aria-label="Close Modal Popup">&times;</a>
+    </div>
+    <div class="pop__content">
+        ${content}
+    </div>
+    </div>`;
+  return el;
+};
 // function myFunction() {
 //   var x = document.getElementById("snackbar");
 //   x.className = "show";
