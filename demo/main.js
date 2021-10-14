@@ -29,9 +29,7 @@ popAndToast
           }
         }
         // close the popup
-        document
-          .querySelector(popAndToast.options.popup.target)
-          .removeChild(popAndToast.options.popup.el);
+        document.body.removeChild(popAndToast.popup.el);
       },
     },
   })
