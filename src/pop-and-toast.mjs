@@ -10,7 +10,10 @@ export const popAndToast = {
     closed: true, // closed state
   },
   toast: {
+    content: '', // modal content
+    duration: 3000, // duration to show the toast message
     el: null, // toast element, must init to build
+    defaultStyle: true, // set to false to implement custom style
   },
   init: function (opts) {
     // only init once
@@ -57,11 +60,14 @@ export const popAndToast = {
       }
 
       // toast init
-      this.toastEl = document.createElement('div');
+      this.toast.el = createToastEl(this.toast.content);
 
-      this.toastEl.innerHTML = `
-        <div class="toast__wrapper">Some toast message ...</div>
-      `;
+      // check for and inject default style
+      if (this.toast.defaultStyle) {
+        const style = document.createElement('style');
+        style.innerHTML = toastStyle;
+        document.head.appendChild(style);
+      }
 
       _ready = true; // only init once
     }
@@ -118,7 +124,24 @@ export const popAndToast = {
     }
     return this;
   },
-  showToast: function () {
+  showToast: function (content) {
+    if (_ready) {
+      const _this = this;
+
+      if (content) {
+        this.toast.el.querySelector('.toast__content').innerHTML = content;
+      }
+
+      document.body.append(_this.toast.el);
+
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          _this.toast.el.classList.remove('toast-show');
+        });
+      }, this.toast.duration);
+    } else {
+      throw Error('PopAndToastError: must init before use.');
+    }
     return this;
   },
 };
@@ -139,6 +162,16 @@ const createPopupEl = (content) => {
     <div class="pop__content">
         ${content}
     </div>
+    </div>`;
+  return el;
+};
+
+const createToastEl = (content) => {
+  const el = document.createElement('div');
+  el.className = 'toast toast-show';
+  el.innerHTML = `
+    <div class="toast__content">
+        ${content}
     </div>`;
   return el;
 };
@@ -198,7 +231,7 @@ const popupStyle = `
 `;
 
 const toastStyle = `
-  .toast__wrapper {
+  .toast {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
@@ -214,28 +247,28 @@ const toastStyle = `
     font-size: 17px;
   }
 
-  .toast__wrapper-show {
+  .toast.toast-show {
     visibility: visible;
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    -webkit-animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
+    animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
   }
 
-  @-webkit-keyframes fadein {
+  @-webkit-keyframes toast-fadein {
     from {bottom: 0; opacity: 0;} 
     to {bottom: 30px; opacity: 1;}
   }
 
-  @keyframes fadein {
+  @keyframes toast-fadein {
     from {bottom: 0; opacity: 0;}
     to {bottom: 30px; opacity: 1;}
   }
 
-  @-webkit-keyframes fadeout {
+  @-webkit-keyframes toast-fadeout {
     from {bottom: 30px; opacity: 1;} 
     to {bottom: 0; opacity: 0;}
   }
 
-  @keyframes fadeout {
+  @keyframes toast-fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
   }
