@@ -34,4 +34,7 @@ popAndToast
   })
   .showPopup();
 // will be called too soon, look for message in console
-setTimeout(() => popAndToast.showPopup('Some updated text'), 5000);
+setTimeout(
+  () => requestAnimationFrame(() => popAndToast.showPopup('Some updated text')),
+  5000
+);

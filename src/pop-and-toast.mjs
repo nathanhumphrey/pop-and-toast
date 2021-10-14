@@ -85,9 +85,10 @@ export const popAndToast = {
       }
     }
 
-    // set/update the last shown date
-    localStorage.setItem('popAndToast', JSON.stringify({ date: Date.now() }));
     if (_showModal) {
+      // set/update the last shown date
+      localStorage.setItem('popAndToast', JSON.stringify({ date: Date.now() }));
+
       const _this = this;
 
       if (content) {
