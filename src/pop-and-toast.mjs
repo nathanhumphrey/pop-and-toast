@@ -14,6 +14,10 @@ export const popAndToast = {
     duration: 3000, // duration to show the toast message
     el: null, // toast element, must init to build
     defaultStyle: true, // set to false to implement custom style
+    onClick: null, // content click callback
+  },
+  toast: {
+    el: null, // toast element, must init to build
   },
   init: function (opts) {
     // only init once
