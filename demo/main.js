@@ -23,7 +23,10 @@ popAndToast
           }
         }
         // close the popup
-        document.body.removeChild(popAndToast.popup.el);
+        popAndToast.closePopup();
+      },
+      onClose: () => {
+        console.log('Popup closed');
       },
     },
   })

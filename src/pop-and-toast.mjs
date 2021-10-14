@@ -7,6 +7,7 @@ export const popAndToast = {
     refresh: 0, // always
     defaultStyle: true, // set to false to implement custom style
     onClick: null, // content click callback
+    onClose: null, // popup closed callback
     closed: true, // closed state
   },
   toast: {
@@ -122,6 +123,8 @@ export const popAndToast = {
     if (!this.popup.closed) {
       document.querySelector(this.popup.target).removeChild(this.popup.el);
       this.popup.closed == true;
+
+      if (this.popup.onClose) this.popup.onClose();
     }
     return this;
   },
