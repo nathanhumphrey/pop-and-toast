@@ -6,7 +6,6 @@ export const popAndToast = {
     content: '', // modal content
     timeout: 0, // immediately
     refresh: 0, // always
-    copy: '', // copy for clipboard on click
     defaultStyle: true, // set to false to implement custom style
     onClick: null, // content click callback
   },
