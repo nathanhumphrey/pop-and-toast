@@ -1,102 +1,96 @@
 export const popAndToast = {
-  options: {
+  popup: {
     // defaults
     target: 'body', // where to insert
-    popupEl: null, // popup element, must init to build
-    toastEl: null,
+    el: null, // popup element, must init to build
     content: '', // modal content
-    timeout: 5000, // 5 seconds
-    refresh: 2592000000, //30 days by default
-    copy: '', // copy for clipboard on click
+    timeout: 0, // immediately
+    refresh: 0, // always
     defaultStyle: true, // set to false to implement custom style
+    onClick: null, // content click callback
+  },
+  toast: {
+    el: null, // toast element, must init to build
   },
   init: function (opts) {
-    let _this = this; // for event listeners
-    let last;
+    // only init once
+    if (!_ready) {
+      let _this = this; // for event listeners
+      let last;
 
-    // popup init
-    _showModal = true;
+      // prep popup and toast options
+      if (opts) {
+        opts.popup = opts.popup || {};
+        opts.toast = opts.toast || {};
 
-    // check for previous popup showing
-    if ((last = localStorage.getItem('popAndToast'))) {
-      last = new Date(JSON.parse(last).date).valueOf();
-
-      // check refresh period for last shown date
-      if (Date.now() - last >= this.options.refresh) {
-        console.info('PopAndToastInfo: too soon to show popup again.');
-        _showModal = false;
-      }
-    } else {
-      // set the last shown date
-      localStorage.setItem('popAndToast', JSON.stringify({ date: Date.now() }));
-    }
-
-    if (_showModal) {
-      // only if we're going to show the modal
-      if (!_ready) {
         // mixin/override options
-        for (const [key, value] of Object.entries(opts)) {
-          this.options[key] = value;
+        for (const [key, value] of Object.entries(opts.popup)) {
+          this.popup[key] = value;
         }
-        // build required properties
-        this.popupEl = document.createElement('div');
-        this.popupEl.classList.add('pop');
 
-        this.popupEl.innerHTML = `
-          <div class="pop__wrapper">
-          <div class="pop__close">
-              <a href="#" aria-label="Close Modal Popup">&times;</a>
-          </div>
-          <div class="pop__content">
-              ${this.options.content}
-          </div>
-          </div>`;
+        for (const [key, value] of Object.entries(opts.toast)) {
+          this.toast[key] = value;
+        }
+      }
+
+      // popup init
+      _showModal = true;
+
+      // check for previous popup showing
+      if ((last = localStorage.getItem('popAndToast'))) {
+        last = +JSON.parse(last).date;
+
+        // check refresh period for last shown date
+        if (Date.now() - last <= this.popup.refresh) {
+          console.info('PopAndToastInfo: too soon to show popup again.');
+          _showModal = false;
+        }
+      }
+
+      if (_showModal) {
+        // set/update the last shown date
+        localStorage.setItem(
+          'popAndToast',
+          JSON.stringify({ date: Date.now() })
+        );
+
+        // build required properties
+        this.popup.el = createPopupEl(this.popup.content);
 
         // add close and copy listeners
-        this.popupEl
+        this.popup.el
           .querySelector('.pop__close')
           .addEventListener('click', (evt) => {
             document
-              .querySelector(_this.options.target)
-              .removeChild(_this.popupEl);
+              .querySelector(_this.popup.target)
+              .removeChild(_this.popup.el);
           });
 
-        this.popupEl
-          .querySelector('.pop__content')
-          .addEventListener('click', async (evt) => {
-            document
-              .querySelector(_this.options.target)
-              .removeChild(_this.popupEl);
-
-            // copy the code to the clipboard
-            if (this.options.copy && navigator.clipboard) {
-              try {
-                await navigator.clipboard.writeText(this.options.copy);
-                console.log('Successfully copied to clipboard');
-              } catch (err) {
-                console.error('Error copying to clipboard');
-              }
-            }
-          });
+        // check for content click callback
+        if (this.popup.onClick) {
+          this.popup.el
+            .querySelector('.pop__content')
+            .addEventListener('click', this.popup.onClick);
+        }
 
         // check for and inject default style
-        if (this.options.defaultStyle) {
+        if (this.popup.defaultStyle) {
           const style = document.createElement('style');
           style.innerHTML = popupStyle;
           document.head.appendChild(style);
         }
       }
-    }
 
-    // toast init
-    if (this.options.toast) {
-      this.toastEl = document.createElement('div');
+      // toast init
+      if (this.popup.toast) {
+        this.toastEl = document.createElement('div');
 
-      this.toastEl.innerHTML = `
+        this.toastEl.innerHTML = `
         <div class="toast-wrapper">Some text some message..</div>
       `;
+      }
+      _ready = true; // only init once
     }
-    _ready = true; // only init once
 
     // return obj for chaining
     return this;
@@ -107,19 +101,18 @@ export const popAndToast = {
       setTimeout(
         () =>
           requestAnimationFrame(() =>
-            document.querySelector(_this.options.target).firstElementChild
+            document.querySelector(_this.popup.target).firstElementChild
               ? document
-                  .querySelector(_this.options.target)
+                  .querySelector(_this.popup.target)
                   .insertBefore(
-                    _this.popupEl,
-                    document.querySelector(_this.options.target)
-                      .firstElementChild
+                    _this.popup.el,
+                    document.querySelector(_this.popup.target).firstElementChild
                   )
               : document
-                  .querySelector(_this.options.target)
-                  .append(_this.popupEl)
+                  .querySelector(_this.popup.target)
+                  .append(_this.popup.el)
           ),
-        this.options.timeout
+        this.popup.timeout
       );
     } else if (!_ready) {
       throw Error('PopAndToastError: must init before use.');
@@ -230,8 +223,17 @@ const toastStyle = `
   }
 `;
 
-// function myFunction() {
-//   var x = document.getElementById("snackbar");
-//   x.className = "show";
-//   setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-// }
+const createPopupEl = (content) => {
+  const el = document.createElement('div');
+  el.classList.add('pop');
+  el.innerHTML = `
+    <div class="pop__wrapper">
+    <div class="pop__close">
+        <a href="#" aria-label="Close Modal Popup">&times;</a>
+    </div>
+    <div class="pop__content">
+        ${content}
+    </div>
+    </div>`;
+  return el;
+};
