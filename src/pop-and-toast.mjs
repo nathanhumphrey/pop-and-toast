@@ -7,6 +7,7 @@ export const popAndToast = {
     refresh: 0, // always
     defaultStyle: true, // set to false to implement custom style
     onClick: null, // content click callback
+    closed: true, // closed state
   },
   toast: {
     el: null, // toast element, must init to build
@@ -38,9 +39,7 @@ export const popAndToast = {
       this.popup.el
         .querySelector('.pop__close')
         .addEventListener('click', (evt) => {
-          document
-            .querySelector(_this.popup.target)
-            .removeChild(_this.popup.el);
+          _this.closePopup();
         });
 
       // check for content click callback
@@ -105,8 +104,15 @@ export const popAndToast = {
               )
           : document.querySelector(_this.popup.target).append(_this.popup.el)
       );
+      this.popup.closed = false;
     } else if (!_ready) {
       throw Error('PopAndToastError: must init before use.');
+    }
+  },
+  closePopup: function () {
+    if (!this.popup.closed) {
+      document.querySelector(this.popup.target).removeChild(this.popup.el);
+      this.popup.closed == true;
     }
   },
   showToast: function () {},
