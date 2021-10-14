@@ -19,6 +19,10 @@ export const popAndToast = {
     let _this = this; // for event listeners
     let last;
 
+    // prep popup and toast options
+    opts.popup = opts.popup || {};
+    opts.toast = opts.toast || {};
+
     // popup init
     _showModal = true;
 
@@ -40,7 +44,7 @@ export const popAndToast = {
       // only if we're going to show the modal
       if (!_ready) {
         // mixin/override options
-        for (const [key, value] of Object.entries(opts)) {
+        for (const [key, value] of Object.entries(opts.popup)) {
           this.options.popup[key] = value;
         }
         // build required properties
