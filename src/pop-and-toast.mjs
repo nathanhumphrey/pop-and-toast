@@ -3,15 +3,17 @@ export const popAndToast = {
     popup: {
       // defaults
       target: 'body', // where to insert
-      popupEl: null, // popup element, must init to build
-      toastEl: null,
+      el: null, // popup element, must init to build
       content: '', // modal content
       timeout: 5000, // 5 seconds
       refresh: 2592000000, //30 days by default
       copy: '', // copy for clipboard on click
       defaultStyle: true, // set to false to implement custom style
+      onClick: null, // content click callback
     },
-    toast: {},
+    toast: {
+      el: null,
+    },
   },
   init: function (opts) {
     let _this = this; // for event listeners
@@ -42,10 +44,10 @@ export const popAndToast = {
           this.options.popup[key] = value;
         }
         // build required properties
-        this.popupEl = document.createElement('div');
-        this.popupEl.classList.add('pop');
+        this.options.popup.el = document.createElement('div');
+        this.options.popup.el.classList.add('pop');
 
-        this.popupEl.innerHTML = `
+        this.options.popup.el.innerHTML = `
           <div class="pop__wrapper">
           <div class="pop__close">
               <a href="#" aria-label="Close Modal Popup">&times;</a>
@@ -56,31 +58,20 @@ export const popAndToast = {
           </div>`;
 
         // add close and copy listeners
-        this.popupEl
+        this.options.popup.el
           .querySelector('.pop__close')
           .addEventListener('click', (evt) => {
             document
               .querySelector(_this.options.popup.target)
-              .removeChild(_this.popupEl);
+              .removeChild(_this.options.popup.el);
           });
 
-        this.popupEl
-          .querySelector('.pop__content')
-          .addEventListener('click', async (evt) => {
-            document
-              .querySelector(_this.options.popup.target)
-              .removeChild(_this.popupEl);
-
-            // copy the code to the clipboard
-            if (this.options.popup.copy && navigator.clipboard) {
-              try {
-                await navigator.clipboard.writeText(this.options.popup.copy);
-                console.log('Successfully copied to clipboard');
-              } catch (err) {
-                console.error('Error copying to clipboard');
-              }
-            }
-          });
+        // check for content click callback
+        if (this.options.popup.onClick) {
+          this.options.popup.el
+            .querySelector('.pop__content')
+            .addEventListener('click', this.options.popup.onClick);
+        }
 
         // check for and inject default style
         if (this.options.popup.defaultStyle) {
@@ -114,13 +105,13 @@ export const popAndToast = {
               ? document
                   .querySelector(_this.options.popup.target)
                   .insertBefore(
-                    _this.popupEl,
+                    _this.options.popup.el,
                     document.querySelector(_this.options.popup.target)
                       .firstElementChild
                   )
               : document
                   .querySelector(_this.options.popup.target)
-                  .append(_this.popupEl)
+                  .append(_this.options.popup.el)
           ),
         this.options.popup.timeout
       );

@@ -17,6 +17,20 @@ popAndToast
       quos minus ab quod fugit praesentium explicabo. Aut voluptatum ullam et veniam 
       maxime eligendi ducimus libero.</p>
       <footer>Some footer</footer>`,
-    copy: 'copy this',
+    onClick: async (evt) => {
+      // copy some content to the clipboard
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText('Something to copy');
+          console.log('Successfully copied to clipboard');
+        } catch (err) {
+          console.error('Error copying to clipboard');
+        }
+      }
+      // close the popup
+      document
+        .querySelector(popAndToast.options.popup.target)
+        .removeChild(popAndToast.options.popup.el);
+    },
   })
   .showPopup();
