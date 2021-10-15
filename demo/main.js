@@ -1,5 +1,3 @@
-import { popAndToast } from '../src/pop-and-toast.mjs';
-
 popAndToast
   .init({
     popup: {
@@ -30,16 +28,16 @@ popAndToast
       },
     },
   })
-  .showPopup();
+  .showPopup()
+  .showToast('First Toast!');
 
 // will be called too soon, look for message in console
 setTimeout(
-  () => requestAnimationFrame(() => popAndToast.showPopup('Some updated text')),
+  () => requestAnimationFrame(() => popAndToast.showPopup('Too soon!')),
   3000
 );
 
-// will fade in from the bottom of the window
 setTimeout(
-  () => requestAnimationFrame(() => popAndToast.showToast('Some toast text')),
+  () => requestAnimationFrame(() => popAndToast.showToast('Second toast!')),
   5000
 );
