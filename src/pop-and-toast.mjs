@@ -176,8 +176,10 @@ const createToastEl = (content) => {
   const el = document.createElement('div');
   el.className = 'toast';
   el.innerHTML = `
-    <div class="toast__content">
-        ${content}
+    <div class="toast__wrapper">
+      <div class="toast__content">
+          ${content}
+      </div>
     </div>`;
   return el;
 };
@@ -239,24 +241,27 @@ const popupStyle = `
 const toastStyle = `
   .toast {
     visibility: hidden;
-    min-width: 250px;
-    margin-left: -125px;
-    background-color: #333;
+    display: flex;
+    justify-content: center;
+    width: 100%;
     color: #fff;
     text-align: center;
-    border-radius: 2px;
-    padding: 16px;
     position: fixed;
     z-index: 1;
-    left: 50%;
     bottom: 30px;
-    font-size: 17px;
   }
 
   .toast.toast-show {
     visibility: visible;
     -webkit-animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
     animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
+  }
+
+  .toast__wrapper {
+    background-color: #666;
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 250px;
   }
 
   @-webkit-keyframes toast-fadein {
