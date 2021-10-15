@@ -1,5 +1,3 @@
-import { popAndToast } from '../src/pop-and-toast.mjs';
-
 popAndToast
   .init({
     popup: {
