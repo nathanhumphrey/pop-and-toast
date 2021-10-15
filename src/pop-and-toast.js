@@ -34,11 +34,8 @@ const popAndToast = (() => {
       if (!_ready) {
         // prep popup and toast options
         if (options) {
-          options.popup = options.popup || {};
-          options.toast = options.toast || {};
-
-          Object.assign(this.popup, options.popup);
-          Object.assign(this.toast, options.toast);
+          Object.assign(this.popup, options.popup || {});
+          Object.assign(this.toast, options.toast || {});
         }
 
         //--> begin popup init
