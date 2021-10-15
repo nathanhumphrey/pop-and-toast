@@ -1,3 +1,9 @@
+/**
+ * The popAndToast object allows for displaying a modal popup or toast
+ * notification in the browser.
+ *
+ * @author Nathan Humphrey
+ */
 const popAndToast = (() => {
   const obj = {
     popup: {
@@ -17,6 +23,12 @@ const popAndToast = (() => {
       el: null, // toast element, must init to build
       defaultStyle: true, // set to false to implement custom style
     },
+    /**
+     * Initialize the popAndToast object for first use.
+     * @param {object} options - User-defined options for popup and
+     * toast.
+     * @returns {object} The initialized popAndToast object.
+     */
     init: function (options) {
       // only init once
       if (!_ready) {
@@ -35,7 +47,7 @@ const popAndToast = (() => {
           }
         }
 
-        // popup init
+        //--> begin popup init
         this.popup.el = createPopupEl(this.popup.content);
 
         // add close and copy listeners
@@ -59,7 +71,7 @@ const popAndToast = (() => {
           document.head.appendChild(style);
         }
 
-        // toast init
+        //--> begin toast init
         this.toast.el = createToastEl(this.toast.content);
 
         // check for and inject default style
@@ -74,6 +86,12 @@ const popAndToast = (() => {
 
       return this;
     },
+    /**
+     * Reveals a modal popup on the screen.
+     * @param {string=} content - String value for the innerHTML of
+     * the popup element.
+     * @returns {object} The popAndToast object.
+     */
     showPopup: function (content) {
       let last;
       _showModal = true;
@@ -117,10 +135,6 @@ const popAndToast = (() => {
       }
       return this;
     },
-    /**
-     *
-     * @returns
-     */
     closePopup: function () {
       if (!this.popup.closed) {
         document.querySelector(this.popup.target).removeChild(this.popup.el);
@@ -132,6 +146,13 @@ const popAndToast = (() => {
       }
       return this;
     },
+    /**
+     * Reveals a toast notification on the screen. Duration for toast
+     * notification is 3 seconds by default.
+     * @param {string=} content - String value for the innerHTML of
+     * the toast element.
+     * @returns {object} The popAndToast object.
+     */
     showToast: function (content) {
       if (_ready) {
         if (content) {
@@ -154,11 +175,28 @@ const popAndToast = (() => {
     },
   };
 
-  // encapsulated state vars
+  /**
+   * Tracks popAndToast initialization. The popAndToast object can
+   * only be initialized once.
+   * @private
+   */
   let _ready = false;
+  /**
+   * Determines whether the modal should be displayed. This variable
+   * is updated based on the refresh period that has been set.
+   * @private
+   */
   let _showModal = false;
 
   // helper functions
+
+  /**
+   * Creates the DOM element for the popup modal.
+   * @param {string} content - String value for the innerHTML of
+   * the popup element.
+   * @returns {HTMLDivElement} HTMLDivElement for popup.
+   * @private
+   */
   const createPopupEl = (content) => {
     const el = document.createElement('div');
     el.classList.add('pop');
@@ -174,6 +212,13 @@ const popAndToast = (() => {
     return el;
   };
 
+  /**
+   * Creates the DOM element for the toast notification.
+   * @param {string} content - String value for the innerHTML of
+   * the toast element.
+   * @returns {HTMLDivElement} HTMLDivElement for toast
+   * @private
+   */
   const createToastEl = (content) => {
     const el = document.createElement('div');
     el.className = 'toast';
@@ -187,8 +232,13 @@ const popAndToast = (() => {
   };
 
   // default CSS styling for popup and toast
+
+  /**
+   * Default styling for the popup element.
+   * @private
+   */
   const popupStyle = `
-.pop {
+    .pop {
       z-index: 10000;
       position: fixed;
       top: 0;
@@ -237,9 +287,12 @@ const popAndToast = (() => {
       color: white;
       text-decoration: none;
       padding: .25rem .5rem;
-  }
-`;
+  }`;
 
+  /**
+   * Default styling for the toast element.
+   * @private
+   */
   const toastStyle = `
   .toast {
     visibility: hidden;
@@ -284,8 +337,7 @@ const popAndToast = (() => {
   @keyframes toast-fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
-  }
-`;
+  }`;
 
   return obj;
 })();
