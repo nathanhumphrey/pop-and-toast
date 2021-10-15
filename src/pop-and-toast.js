@@ -16,22 +16,21 @@ const popAndToast = (() => {
       duration: 3000, // duration to show the toast message
       el: null, // toast element, must init to build
       defaultStyle: true, // set to false to implement custom style
-      onClick: null, // content click callback
     },
-    init: function (opts) {
+    init: function (options) {
       // only init once
       if (!_ready) {
         // prep popup and toast options
-        if (opts) {
-          opts.popup = opts.popup || {};
-          opts.toast = opts.toast || {};
+        if (options) {
+          options.popup = options.popup || {};
+          options.toast = options.toast || {};
 
           // mixin/override options
-          for (const [key, value] of Object.entries(opts.popup)) {
+          for (const [key, value] of Object.entries(options.popup)) {
             this.popup[key] = value;
           }
 
-          for (const [key, value] of Object.entries(opts.toast)) {
+          for (const [key, value] of Object.entries(options.toast)) {
             this.toast[key] = value;
           }
         }
