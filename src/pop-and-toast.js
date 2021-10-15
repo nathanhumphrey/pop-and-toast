@@ -12,7 +12,7 @@ const popAndToast = (() => {
       closed: true, // closed state
     },
     toast: {
-      content: '', // modal content
+      content: '', // toast content
       duration: 3000, // duration to show the toast message
       el: null, // toast element, must init to build
       defaultStyle: true, // set to false to implement custom style
@@ -21,8 +21,6 @@ const popAndToast = (() => {
     init: function (opts) {
       // only init once
       if (!_ready) {
-        let _this = this; // for event listeners
-
         // prep popup and toast options
         if (opts) {
           opts.popup = opts.popup || {};
@@ -45,7 +43,7 @@ const popAndToast = (() => {
         this.popup.el
           .querySelector('.pop__close')
           .addEventListener('click', (evt) => {
-            _this.closePopup();
+            this.closePopup();
           });
 
         // check for content click callback
@@ -72,21 +70,20 @@ const popAndToast = (() => {
           document.head.appendChild(style);
         }
 
-        _ready = true; // only init once
+        _ready = true;
       }
 
-      // return obj for chaining
       return this;
     },
     showPopup: function (content) {
       let last;
       _showModal = true;
 
-      // check for previous popup showing
+      // check for last showing
       if ((last = localStorage.getItem('popAndToast'))) {
         last = +JSON.parse(last).date;
 
-        // check refresh period for last shown date
+        // check refresh period for last shown
         if (Date.now() - last <= this.popup.refresh) {
           console.info('PopAndToastInfo: too soon to show popup again.');
           _showModal = false;
@@ -100,21 +97,19 @@ const popAndToast = (() => {
           JSON.stringify({ date: Date.now() })
         );
 
-        const _this = this;
-
         if (content) {
           this.popup.el.querySelector('.pop__content').innerHTML = content;
         }
 
         requestAnimationFrame(() =>
-          document.querySelector(_this.popup.target).firstElementChild
+          document.querySelector(this.popup.target).firstElementChild
             ? document
-                .querySelector(_this.popup.target)
+                .querySelector(this.popup.target)
                 .insertBefore(
-                  _this.popup.el,
-                  document.querySelector(_this.popup.target).firstElementChild
+                  this.popup.el,
+                  document.querySelector(this.popup.target).firstElementChild
                 )
-            : document.querySelector(_this.popup.target).append(_this.popup.el)
+            : document.querySelector(this.popup.target).append(this.popup.el)
         );
 
         this.popup.closed = false;
@@ -123,30 +118,34 @@ const popAndToast = (() => {
       }
       return this;
     },
+    /**
+     *
+     * @returns
+     */
     closePopup: function () {
       if (!this.popup.closed) {
         document.querySelector(this.popup.target).removeChild(this.popup.el);
         this.popup.closed == true;
 
-        if (this.popup.onClose) this.popup.onClose();
+        if (this.popup.onClose) {
+          this.popup.onClose();
+        }
       }
       return this;
     },
     showToast: function (content) {
       if (_ready) {
-        const _this = this;
-
         if (content) {
           this.toast.el.querySelector('.toast__content').innerHTML = content;
         }
 
-        document.body.append(_this.toast.el);
-        _this.toast.el.classList.add('toast-show');
+        document.body.append(this.toast.el);
+        this.toast.el.classList.add('toast-show');
 
         setTimeout(() => {
           requestAnimationFrame(() => {
-            _this.toast.el.classList.remove('toast-show');
-            _this.toast.el.remove();
+            this.toast.el.classList.remove('toast-show');
+            this.toast.el.remove();
           });
         }, this.toast.duration);
       } else {
