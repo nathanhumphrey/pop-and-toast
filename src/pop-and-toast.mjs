@@ -137,10 +137,12 @@ export const popAndToast = {
       }
 
       document.body.append(_this.toast.el);
+      _this.toast.el.classList.add('toast-show');
 
       setTimeout(() => {
         requestAnimationFrame(() => {
           _this.toast.el.classList.remove('toast-show');
+          _this.toast.el.remove();
         });
       }, this.toast.duration);
     } else {
@@ -172,7 +174,7 @@ const createPopupEl = (content) => {
 
 const createToastEl = (content) => {
   const el = document.createElement('div');
-  el.className = 'toast toast-show';
+  el.className = 'toast';
   el.innerHTML = `
     <div class="toast__content">
         ${content}
