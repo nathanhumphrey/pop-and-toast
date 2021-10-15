@@ -37,14 +37,8 @@ const popAndToast = (() => {
           options.popup = options.popup || {};
           options.toast = options.toast || {};
 
-          // mixin/override options
-          for (const [key, value] of Object.entries(options.popup)) {
-            this.popup[key] = value;
-          }
-
-          for (const [key, value] of Object.entries(options.toast)) {
-            this.toast[key] = value;
-          }
+          Object.assign(this.popup, options.popup);
+          Object.assign(this.toast, options.toast);
         }
 
         //--> begin popup init
