@@ -41,7 +41,7 @@ const popAndToast = (() => {
         //--> begin popup init
         this.popup.el = createPopupEl(this.popup.content);
 
-        // add close and copy listeners
+        // add close listener
         this.popup.el
           .querySelector('.pop__close')
           .addEventListener('click', (evt) => {
@@ -84,56 +84,67 @@ const popAndToast = (() => {
      * @returns {object} The popAndToast object.
      */
     showPopup: function (content) {
-      let last;
-      _showModal = true;
+      if (_ready) {
+        let last;
+        _showModal = true;
 
-      // check for last showing
-      if ((last = localStorage.getItem('popAndToast'))) {
-        last = +JSON.parse(last).date;
+        // check for last showing
+        if ((last = localStorage.getItem('popAndToast'))) {
+          last = +JSON.parse(last).date;
 
-        // check refresh period for last shown
-        if (Date.now() - last <= this.popup.refresh) {
-          console.info('PopAndToastInfo: too soon to show popup again.');
-          _showModal = false;
-        }
-      }
-
-      if (_showModal) {
-        // set/update the last shown date
-        localStorage.setItem(
-          'popAndToast',
-          JSON.stringify({ date: Date.now() })
-        );
-
-        if (content) {
-          this.popup.el.querySelector('.pop__content').innerHTML = content;
+          // check refresh period for last shown
+          if (Date.now() - last <= this.popup.refresh) {
+            console.info('PopAndToastInfo: too soon to show popup again.');
+            _showModal = false;
+          }
         }
 
-        requestAnimationFrame(() =>
-          document.querySelector(this.popup.target).firstElementChild
-            ? document
-                .querySelector(this.popup.target)
-                .insertBefore(
-                  this.popup.el,
-                  document.querySelector(this.popup.target).firstElementChild
-                )
-            : document.querySelector(this.popup.target).append(this.popup.el)
-        );
+        if (_showModal) {
+          // set/update the last shown date
+          localStorage.setItem(
+            'popAndToast',
+            JSON.stringify({ date: Date.now() })
+          );
 
-        this.popup.closed = false;
-      } else if (!_ready) {
+          if (content) {
+            this.popup.el.querySelector('.pop__content').innerHTML = content;
+          }
+
+          requestAnimationFrame(() =>
+            document.querySelector(this.popup.target).firstElementChild
+              ? document
+                  .querySelector(this.popup.target)
+                  .insertBefore(
+                    this.popup.el,
+                    document.querySelector(this.popup.target).firstElementChild
+                  )
+              : document.querySelector(this.popup.target).append(this.popup.el)
+          );
+
+          this.popup.closed = false;
+        }
+      } else {
         throw Error('PopAndToastError: must init before use.');
       }
       return this;
     },
+    /**
+     * Removes the popup element from the document and calls the
+     * onClose callback if assigned.
+     * @returns {object} The popAndToast object.
+     */
     closePopup: function () {
-      if (!this.popup.closed) {
-        document.querySelector(this.popup.target).removeChild(this.popup.el);
-        this.popup.closed == true;
+      if (_ready) {
+        if (!this.popup.closed) {
+          this.popup.el.remove();
+          this.popup.closed == true;
 
-        if (this.popup.onClose) {
-          this.popup.onClose();
+          if (this.popup.onClose) {
+            this.popup.onClose();
+          }
         }
+      } else {
+        throw Error('PopAndToastError: must init before use.');
       }
       return this;
     },
@@ -193,12 +204,10 @@ const popAndToast = (() => {
     el.classList.add('pop');
     el.innerHTML = `
     <div class="pop__wrapper">
-    <div class="pop__close">
+      <div class="pop__close">
         <a href="#" aria-label="Close Modal Popup">&times;</a>
-    </div>
-    <div class="pop__content">
-        ${content}
-    </div>
+      </div>
+      <div class="pop__content">${content}</div>
     </div>`;
     return el;
   };
@@ -215,9 +224,7 @@ const popAndToast = (() => {
     el.className = 'toast';
     el.innerHTML = `
     <div class="toast__wrapper">
-      <div class="toast__content">
-          ${content}
-      </div>
+      <div class="toast__content">${content}</div>
     </div>`;
     return el;
   };
@@ -299,7 +306,6 @@ const popAndToast = (() => {
 
   .toast.toast-show {
     visibility: visible;
-    -webkit-animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
     animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
   }
 
@@ -310,19 +316,9 @@ const popAndToast = (() => {
     min-width: 250px;
   }
 
-  @-webkit-keyframes toast-fadein {
-    from {bottom: 0; opacity: 0;} 
-    to {bottom: 30px; opacity: 1;}
-  }
-
   @keyframes toast-fadein {
     from {bottom: 0; opacity: 0;}
     to {bottom: 30px; opacity: 1;}
-  }
-
-  @-webkit-keyframes toast-fadeout {
-    from {bottom: 30px; opacity: 1;} 
-    to {bottom: 0; opacity: 0;}
   }
 
   @keyframes toast-fadeout {
@@ -332,3 +328,7 @@ const popAndToast = (() => {
 
   return obj;
 })();
+
+if (typeof exports != 'undefined') {
+  exports.popAndToast = popAndToast;
+}
