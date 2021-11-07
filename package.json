@@ -4,7 +4,8 @@
   "description": "Displays popup modal and toast notification",
   "browser": "./dist/pop-and-toast.js",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest",
+    "watch": "jest --watch",
     "build": "npx uglifyjs -c -m -o ./dist/pop-and-toast.js -- ./src/pop-and-toast.js"
   },
   "repository": {
