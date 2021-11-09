@@ -16,6 +16,10 @@ beforeEach(() => {
 });
 
 describe('=== INIT TESTS', () => {
+  test('init() returns the popAndToast object', () => {
+    expect(p.init()).toBe(p);
+  });
+
   test('init({ opts }) overrides defaults', () => {
     expect(p.popup.target).toEqual('body');
     expect(p.toast.defaultStyle).toEqual(true);
@@ -127,6 +131,11 @@ describe('=== POPUP TESTS', () => {
     );
   });
 
+  test('showPopup() returns the popAndToast object', () => {
+    p.init();
+    expect(p.showPopup()).toBe(p);
+  });
+
   test('showPopup() inserts popup element into the body by default', () => {
     p.init();
     p.showPopup();
@@ -154,6 +163,11 @@ describe('=== POPUP TESTS', () => {
     );
   });
 
+  test('closePopup() returns the popAndToast object', () => {
+    p.init();
+    expect(p.closePopup()).toBe(p);
+  });
+
   test('closePopup() removes the popup element from the document', () => {
     p.init();
     document.body.appendChild(p.popup.el);
@@ -166,8 +180,12 @@ describe('=== POPUP TESTS', () => {
     expect(document.body.contains(p.popup.el)).toEqual(false);
   });
 
-  test.skip('showPopup() refresh prevents popup element insertion', () => {
-    expect(popAndToast).not.toBe(null);
+  test('showPopup() refresh prevents popup element insertion', () => {
+    p.init({ popup: { refresh: 1000 } });
+    p.showPopup();
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+    p.showPopup(); // too soon
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -185,8 +203,16 @@ describe('=== TOAST TESTS', () => {
     );
   });
 
-  test.skip('showToast() inserts toast element into the document', () => {
-    expect(popAndToast).not.toBe(null);
+  test('showToast() returns the popAndToast object', () => {
+    p.init();
+    expect(p.showToast()).toBe(p);
+  });
+
+  test('showToast() inserts toast element into the body', () => {
+    p.init();
+    p.showToast();
+
+    expect(document.body.lastElementChild).toEqual(p.toast.el);
   });
 
   test('showToast(content) content param is correctly inserted', () => {

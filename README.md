@@ -1,5 +1,7 @@
 # Pop and Toast
 
+![node.js workflow](https://github.com/nathanhumphrey/pop-and-toast/actions/workflows/node.js.yml/badge.svg)
+
 ## Purpose
 
 Display a modal popup or a toast notification.
@@ -110,4 +112,5 @@ There are default styles applied to both popup and toast elements. The styles ca
 
 ## Future Features
 
+- Allow for displaying toast until dismissed
 - Allow for custom toast duration option (currently 3s)
