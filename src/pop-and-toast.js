@@ -89,9 +89,11 @@ const popAndToast = (() => {
         _showModal = true;
 
         // check for last showing
-        if ((last = localStorage.getItem('popAndToast'))) {
+        if (
+          this.popup.refresh > 0 &&
+          (last = localStorage.getItem('popAndToast'))
+        ) {
           last = +JSON.parse(last).date;
-
           // check refresh period for last shown
           if (Date.now() - last <= this.popup.refresh) {
             console.info('PopAndToastInfo: too soon to show popup again.');
@@ -100,11 +102,13 @@ const popAndToast = (() => {
         }
 
         if (_showModal) {
-          // set/update the last shown date
-          localStorage.setItem(
-            'popAndToast',
-            JSON.stringify({ date: Date.now() })
-          );
+          if (this.popup.refresh > 0) {
+            // set/update the last shown date
+            localStorage.setItem(
+              'popAndToast',
+              JSON.stringify({ date: Date.now() })
+            );
+          }
 
           if (content) {
             this.popup.el.querySelector('.pop__content').innerHTML = content;
